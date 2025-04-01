@@ -74,7 +74,7 @@ export default function ContactoPage() {
                 <MapPin className="h-5 w-5 mr-3 text-gray-400 mt-0.5" />
                 <div>
                   <p className="font-medium text-sm">Dirección</p>
-                  <p className="text-gray-400 text-sm">Av. Providencia 1234, Providencia, Santiago</p>
+                  <p className="text-gray-400 text-sm">Av. Lope de Vega 2481, Capital Federal, Devoto</p>
                 </div>
               </div>
 
@@ -82,7 +82,7 @@ export default function ContactoPage() {
                 <Phone className="h-5 w-5 mr-3 text-gray-400 mt-0.5" />
                 <div>
                   <p className="font-medium text-sm">Teléfono</p>
-                  <p className="text-gray-400 text-sm">+56 2 2123 4567</p>
+                  <p className="text-gray-400 text-sm">+54 9 11 7368-2567</p>
                 </div>
               </div>
 
@@ -90,7 +90,7 @@ export default function ContactoPage() {
                 <Mail className="h-5 w-5 mr-3 text-gray-400 mt-0.5" />
                 <div>
                   <p className="font-medium text-sm">Email</p>
-                  <p className="text-gray-400 text-sm">contacto@gpmautomotriz.cl</p>
+                  <p className="text-gray-400 text-sm">cpmautomotoresvd@gmail.com</p>
                 </div>
               </div>
 
@@ -98,21 +98,25 @@ export default function ContactoPage() {
                 <Clock className="h-5 w-5 mr-3 text-gray-400 mt-0.5" />
                 <div>
                   <p className="font-medium text-sm">Horario de Atención</p>
-                  <p className="text-gray-400 text-sm">Lunes a Viernes: 9:00 - 19:00</p>
-                  <p className="text-gray-400 text-sm">Sábado: 10:00 - 14:00</p>
+                  <p className="text-gray-400 text-sm">Lunes a Viernes: 10:00 - 19:00</p>
+                  <p className="text-gray-400 text-sm">Sábado: 10:00 - 17:00</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="aspect-video relative rounded-lg overflow-hidden">
-            <Image
-              src="/placeholder.svg?height=300&width=600&text=Mapa"
-              alt="Ubicación GPM"
-              fill
-              className="object-cover"
-            />
-          </div>
+            <div className="aspect-video relative rounded-lg overflow-hidden">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3283.433830301183!2d-58.52167852376382!3d-34.618475572949045!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bcc828f6444fe9%3A0x99a3398e056cbd2!2sCPM%20Autos%20S.%20R.%20L.!5e0!3m2!1ses-419!2sar!4v1743436782523!5m2!1ses-419!2sar"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="rounded-lg"
+            ></iframe>
+            </div>
         </div>
 
         <div className="clean-card rounded-lg p-5">
@@ -212,7 +216,7 @@ export default function ContactoPage() {
         </div>
       </div>
 
-      <WhatsAppFab phoneNumber="+123456789" message="Hola, me gustaría obtener más información" />
+      <WhatsAppFab phoneNumber="+54 9 11 7368-2567" message="Hola, estoy interesado en conocer más sobre sus vehículos" />
     </main>
   )
 }

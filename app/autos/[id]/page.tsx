@@ -67,12 +67,12 @@ export default function CarDetailPage({ params }: { params: { id: string } }) {
       )}
 
       <div className="p-4 space-y-6 md:container md:mx-auto md:pt-8">
+        <h1 className="text-2xl font-light uppercase mb-4 md:text-3xl">
+          {car.brand} {car.model}
+        </h1>
+
         <div className="md:flex md:gap-8">
           <div className="md:w-1/2">
-            <h1 className="text-2xl font-light uppercase mb-4 md:text-3xl">
-              {car.brand} {car.model}
-            </h1>
-
             <div className="aspect-[4/3] relative rounded-lg overflow-hidden mb-6">
               <Image
                 src={car.imageUrl || "/placeholder.svg?height=400&width=600"}

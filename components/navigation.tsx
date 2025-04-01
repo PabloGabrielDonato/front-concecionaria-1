@@ -62,7 +62,7 @@ export default function Navigation() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center">
-            <span className="gold-gradient text-xl">GPM</span>
+            <img src="/logo.png" alt="Logo" className="h-8 w-auto" />
           </Link>
 
           <nav className="flex items-center space-x-8">
@@ -72,7 +72,7 @@ export default function Navigation() {
                 href={item.href}
                 className={cn(
                   "flex items-center text-sm font-medium transition-colors",
-                  pathname === item.href ? "text-white" : "text-gray-400 hover:text-white",
+                  pathname === item.href ? "text-white" : "text-amber-500 hover:text-white",
                 )}
               >
                 <item.icon className="h-4 w-4 mr-2" />

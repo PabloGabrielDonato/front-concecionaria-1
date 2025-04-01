@@ -8,9 +8,9 @@ import Navigation from "@/components/navigation"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "GPM Automotriz",
+  title: "CPM Autos",
   description: "Encuentra tu auto ideal",
-  generator: "v0.dev",
+  
 }
 
 export default function RootLayout({

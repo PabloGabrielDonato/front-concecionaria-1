@@ -14,11 +14,11 @@ export default function Home() {
       <div className="p-4 space-y-8 md:pt-8 md:container md:mx-auto">
         <DesktopBanner />
 
-        <h1 className="text-2xl font-light mb-6 md:text-3xl">Encuentra tu auto ideal</h1>
+        <h1 className="text-2xl font-light mb-6 md:text-3xl">Encontrá tu auto ideal</h1>
 
         <div className="space-y-8">
           <div className="clean-card rounded-lg p-6">
-            <h2 className="text-lg font-light mb-4">Marcas populares</h2>
+            <h2 className="text-lg font-light mb-4">Nuestras marcas</h2>
             <div className="flex gap-3 overflow-x-auto pb-2">
               {["Chevrolet", "Toyota", "Nissan", "Ford", "BMW", "Audi"].map((brand) => (
                 <Link
@@ -33,7 +33,7 @@ export default function Home() {
           </div>
 
           <div>
-            <h2 className="text-lg font-light mb-4">Destacados</h2>
+            <h2 className="text-lg font-light mb-4">Ultimos ingresos</h2>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {[1, 2, 3].map((item) => (
                 <Link
@@ -43,7 +43,7 @@ export default function Home() {
                 >
                   <div className="aspect-video relative">
                     <Image
-                      src="/placeholder.svg?height=200&width=400"
+                      src="/cruze.jpeg"
                       alt="Auto destacado"
                       fill
                       className="object-cover"
@@ -61,7 +61,7 @@ export default function Home() {
         </div>
       </div>
 
-      <WhatsAppFab phoneNumber="+123456789" message="Hola, estoy interesado en conocer más sobre sus vehículos" />
+      <WhatsAppFab phoneNumber="+54 9 11 7368-2567" message="Hola, estoy interesado en conocer más sobre sus vehículos" />
     </main>
   )
 }

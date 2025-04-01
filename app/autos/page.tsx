@@ -214,8 +214,8 @@ export default function AutosPage() {
               <Slider
                 defaultValue={priceRange}
                 value={priceRange}
-                min={5000000}
-                max={50000000}
+                min={4000000}
+                max={100000000}
                 step={1000000}
                 onValueChange={setPriceRange}
                 className="my-6"
@@ -308,7 +308,7 @@ export default function AutosPage() {
         )}
       </div>
 
-      <WhatsAppFab phoneNumber="+123456789" message="Hola, estoy interesado en conocer más sobre sus vehículos" />
+      <WhatsAppFab phoneNumber="+54 9 11 7368-2567" message="Hola, estoy interesado en conocer más sobre sus vehículos" />
     </main>
   )
 }
