@@ -18,14 +18,30 @@ export default function Home() {
 
         <div className="space-y-8">
           <div className="clean-card rounded-lg p-6">
-            <h2 className="text-lg font-light mb-4">Nuestras marcas</h2>
             <div className="flex gap-3 overflow-x-auto pb-2">
               {["Chevrolet", "Toyota", "Nissan", "Ford", "BMW", "Audi"].map((brand) => (
                 <Link
                   key={brand}
                   href={`/autos?marca=${brand}`}
-                  className="px-4 py-2 bg-black bg-opacity-40 rounded-full text-sm whitespace-nowrap hover:bg-opacity-60 transition-colors"
+                  className="
+                    group
+                    flex flex-col
+                    items-center
+                    justify-center
+                    w-20 h-20
+                    bg-black bg-opacity-40
+                    rounded-full
+                    border-2 border-amber-500
+                    text-xs whitespace-nowrap 
+                    hover:bg-amber-500 hover:text-black transition-colors"
                 >
+                  <Image
+                    src={`/${brand.toLowerCase()}.svg`} // Asegúrate de tener las imágenes en la carpeta /public
+                    alt={`Logo de ${brand}`}
+                    width={40} // Ajusta el tamaño del logo
+                    height={40}
+                    className="filter invert group-hover:invert-0" // Cambia a negro al hacer hover
+                  />
                   {brand}
                 </Link>
               ))}
