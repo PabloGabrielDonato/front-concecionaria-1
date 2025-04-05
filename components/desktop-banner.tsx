@@ -8,9 +8,11 @@ export default function DesktopBanner() {
       <Image src="/fachada.jpg" alt="Banner promocional" fill className="object-cover" />
       <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent flex flex-col justify-around p-12">
         <div>
-          <h2 className="text-4xl font-extrabold shadow-md   mb-4 max-w-md">Descubrí tu próximo vehículo con nosotros</h2>
-          <p className="text-gray-300 mb-6 max-w-md">
-            Ofrecemos una amplia selección de vehículos de calidad con financiamiento personalizado.
+          <h2 className="text-5xl font-extrabold shadow-lg mb-4">Descubrí tu próximo vehículo</h2>
+          <p className="text-gray-300 mb-6 max-w-xl">
+            En <strong>CPM Autos</strong> tenemos el vehiculo ideal para vos.
+            Estamos listos para ayudarte con tus consultas. Ofreciendo una amplia variedad de modelos
+            y el financiamiento que mejor se adapte a tus necesidades.
           </p>
         </div>
         <div className="flex gap-4">

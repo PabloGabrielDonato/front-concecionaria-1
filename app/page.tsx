@@ -13,12 +13,10 @@ export default function Home() {
 
       <div className="p-4 space-y-8 md:pt-8 md:container md:mx-auto">
         <DesktopBanner />
-
-        <h1 className="text-2xl font-light mb-6 md:text-3xl">Encontrá tu auto ideal</h1>
-
+        
         <div className="space-y-8">
           <div className="clean-card rounded-lg p-6">
-            <div className="flex gap-3 overflow-x-auto pb-2">
+            <div className="flex gap-3 justify-around overflow-x-auto pb-2">
               {["Chevrolet", "Toyota", "Nissan", "Ford", "BMW", "Audi"].map((brand) => (
                 <Link
                   key={brand}
@@ -29,6 +27,7 @@ export default function Home() {
                     items-center
                     justify-center
                     w-20 h-20
+                    flex-shrink-0
                     bg-black bg-opacity-40
                     rounded-full
                     border-2 border-amber-500
