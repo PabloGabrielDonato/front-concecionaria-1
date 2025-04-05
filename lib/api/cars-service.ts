@@ -137,12 +137,12 @@ const mockCars: Car[] = [
 const bodyTypes = ["Sedan", "SUV", "Hatchback", "Pickup", "Coupé", "Convertible"]
 
 interface FetchCarsParams {
-  brand?: string | null
+  brands?: string[] // Cambiado a un arreglo para admitir múltiples marcas
   minPrice?: number
   maxPrice?: number
   yearFrom?: number
   yearTo?: number
-  bodyType?: string | null
+  bodyTypes?: string[] // Cambiado a un arreglo para admitir múltiples tipos de carrocería
 }
 
 // Function to fetch cars with filters
@@ -152,8 +152,8 @@ export async function fetchCars(params: FetchCarsParams = {}): Promise<Car[]> {
 
   // Filter cars based on params
   return mockCars.filter((car) => {
-    // Filter by brand
-    if (params.brand && car.brand !== params.brand) {
+    // Filter by brands
+    if (params.brands && params.brands.length > 0 && !params.brands.includes(car.brand)) {
       return false
     }
 
@@ -173,8 +173,8 @@ export async function fetchCars(params: FetchCarsParams = {}): Promise<Car[]> {
       return false
     }
 
-    // Filter by body type
-    if (params.bodyType && car.bodyType !== params.bodyType) {
+    // Filter by body types
+    if (params.bodyTypes && params.bodyTypes.length > 0 && !params.bodyTypes.includes(car.bodyType)) {
       return false
     }
 
