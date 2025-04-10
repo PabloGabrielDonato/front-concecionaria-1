@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { use, useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { ChevronLeft } from "lucide-react"
@@ -8,8 +8,12 @@ import { Button } from "@/components/ui/button"
 import { fetchCarById } from "@/lib/api/cars-service"
 import type { Car } from "@/lib/domain/models/car"
 import { useMobile } from "@/hooks/use-mobile"
+import { Carousel } from "react-responsive-carousel"
+import "react-responsive-carousel/lib/styles/carousel.min.css"
 
-export default function CarDetailPage({ params }: { params: { id: string } }) {
+export default function CarDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params) // Desenvuelve la promesa de `params`
+
   const [car, setCar] = useState<Car | null>(null)
   const [loading, setLoading] = useState(true)
   const isMobile = useMobile()
@@ -18,7 +22,7 @@ export default function CarDetailPage({ params }: { params: { id: string } }) {
     const loadCar = async () => {
       setLoading(true)
       try {
-        const result = await fetchCarById(params.id)
+        const result = await fetchCarById(id) // Usa `id` directamente
         setCar(result)
       } catch (error) {
         console.error("Error fetching car details:", error)
@@ -28,7 +32,7 @@ export default function CarDetailPage({ params }: { params: { id: string } }) {
     }
 
     loadCar()
-  }, [params.id])
+  }, [id])
 
   if (loading) {
     return (
@@ -72,20 +76,26 @@ export default function CarDetailPage({ params }: { params: { id: string } }) {
         </h1>
 
         <div className="md:flex md:gap-8">
-          <div className="md:w-1/2">
+          <div className="md:w-3/5">
             <div className="aspect-[4/3] relative rounded-lg overflow-hidden mb-6">
-              <Image
-                src={car.images[0] || "/placeholder.svg?height=400&width=600"}
-                alt={car.model}
-                fill
-                className="object-cover"
-              />
+              <Carousel autoPlay={true} infiniteLoop={true} showThumbs={false} showStatus={false} showIndicators={false}>
+                {car.images.map((image, index) => (
+                  <div key={index} className="relative aspect-[4/3]">
+                    <Image
+                      src={image || "/placeholder.svg?height=400&width=600"}
+                      alt={`${car.model} - Image ${index + 1}`}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                ))}
+              </Carousel>
             </div>
           </div>
 
-          <div className="md:w-1/2">
+          <div className="md:w-2/5">
             <div className="clean-card rounded-lg p-5 space-y-6">
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-2 gap-6 md:grid-cols-1">
                 <div>
                   <p className="text-gray-400 text-sm">Marca</p>
                   <p className="font-medium">{car.brand_name}</p>
