@@ -68,14 +68,14 @@ export default function CarDetailPage({ params }: { params: { id: string } }) {
 
       <div className="p-4 space-y-6 md:container md:mx-auto md:pt-8">
         <h1 className="text-2xl font-light uppercase mb-4 md:text-3xl">
-          {car.brand} {car.model}
+          {car.brand_name} {car.model}
         </h1>
 
         <div className="md:flex md:gap-8">
           <div className="md:w-1/2">
             <div className="aspect-[4/3] relative rounded-lg overflow-hidden mb-6">
               <Image
-                src={car.imageUrl || "/placeholder.svg?height=400&width=600"}
+                src={car.images[0] || "/placeholder.svg?height=400&width=600"}
                 alt={car.model}
                 fill
                 className="object-cover"
@@ -88,13 +88,11 @@ export default function CarDetailPage({ params }: { params: { id: string } }) {
               <div className="grid grid-cols-2 gap-6">
                 <div>
                   <p className="text-gray-400 text-sm">Marca</p>
-                  <p className="font-medium">{car.brand}</p>
+                  <p className="font-medium">{car.brand_name}</p>
                 </div>
                 <div>
                   <p className="text-gray-400 text-sm">Modelo</p>
-                  <p className="font-medium">
-                    {car.model} - {car.engine}
-                  </p>
+                  <p className="font-medium">{car.model}</p>
                 </div>
                 <div>
                   <p className="text-gray-400 text-sm">Año</p>
@@ -102,12 +100,12 @@ export default function CarDetailPage({ params }: { params: { id: string } }) {
                 </div>
                 <div>
                   <p className="text-gray-400 text-sm">Carrocería</p>
-                  <p className="font-medium">{car.bodyType}</p>
+                  <p className="font-medium">{car.bodywork}</p>
                 </div>
               </div>
 
               <div className="pt-2">
-                <h2 className="text-2xl font-light mb-1">$ {car.price.toLocaleString()}</h2>
+                <h2 className="text-2xl font-light mb-1">$ {parseInt(car.sale_price).toLocaleString()}</h2>
                 <p className="text-xs text-gray-400">Precio sujeto a modificación</p>
               </div>
             </div>
@@ -129,28 +127,6 @@ export default function CarDetailPage({ params }: { params: { id: string } }) {
               </svg>
               Contáctanos
             </Button>
-          </div>
-        </div>
-
-        <div className="space-y-6 md:grid md:grid-cols-2 md:gap-6 md:space-y-0">
-          <div className="clean-card rounded-lg p-5">
-            <h3 className="font-light mb-3">Descripción</h3>
-            <p className="text-gray-300 text-sm leading-relaxed">
-              {car.description ||
-                "Chevrolet Cruze 1.8 LT, excelente estado, único dueño, mantenciones al día, aire acondicionado, dirección asistida, cierre centralizado, alzavidrios eléctricos."}
-            </p>
-          </div>
-
-          <div className="clean-card rounded-lg p-5">
-            <h3 className="font-light mb-3">Características</h3>
-            <ul className="grid grid-cols-2 gap-3">
-              {car.features.map((feature, index) => (
-                <li key={index} className="flex items-center text-sm">
-                  <div className="w-1.5 h-1.5 rounded-full bg-white mr-2"></div>
-                  {feature}
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
       </div>

@@ -7,27 +7,33 @@ import { ChevronLeft, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { useSearchParams, useRouter } from "next/navigation"
-import { fetchCars, fetchBodyTypes } from "@/lib/api/cars-service"
+import { fetchCars, setCars, getCars } from "@/lib/api/cars-service"
 import type { Car } from "@/lib/domain/models/car"
 import WhatsAppFab from "@/components/whatsapp-fab"
 import { useMobile } from "@/hooks/use-mobile"
+
+const capitalize = (text: string) => {
+  return text
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
 
 export default function AutosPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const isMobile = useMobile()
-  const [cars, setCars] = useState<Car[]>([])
+  const [cars, setCarsState] = useState<Car[]>([])
   const [loading, setLoading] = useState(true)
-  const [priceRange, setPriceRange] = useState([15000000, 29000000])
+  const [priceRange, setPriceRange] = useState([4000000, 100000000])
 
-  // Update state to handle arrays of selected values
   const [selectedBrands, setSelectedBrands] = useState<string[]>([])
-  const [bodyTypes, setBodyTypes] = useState<string[]>([])
   const [selectedBodyTypes, setSelectedBodyTypes] = useState<string[]>([])
 
-  const brands = ["Alfa Romeo", "Audi", "BMW", "Chevrolet", "Nissan", "Toyota"]
+  const [brands, setBrands] = useState<string[]>([])
+  const [bodyTypes, setBodyTypes] = useState<string[]>([])
 
-  // Parse URL parameters on initial load
   useEffect(() => {
     const marcaParam = searchParams.getAll("marca")
     const carroceriaParam = searchParams.getAll("carroceria")
@@ -42,44 +48,21 @@ export default function AutosPage() {
   }, [searchParams])
 
   useEffect(() => {
-    // Cargar tipos de carrocería
-    const loadBodyTypes = async () => {
-      try {
-        const types = await fetchBodyTypes()
-        setBodyTypes(types)
-      } catch (error) {
-        console.error("Error fetching body types:", error)
-      }
-    }
-
-    loadBodyTypes()
-  }, [])
-
-  useEffect(() => {
     const loadCars = async () => {
       setLoading(true)
       try {
-        // Fetch cars with no brand filter if none selected, otherwise filter by the selected brands
-        const result = await fetchCars({
-          brand: selectedBrands.length > 0 ? selectedBrands[0] : null, // API only supports one brand for now
-          minPrice: priceRange[0],
-          maxPrice: priceRange[1],
-          yearFrom: 2010,
-          bodyType: selectedBodyTypes.length > 0 ? selectedBodyTypes[0] : null, // API only supports one body type for now
-        })
+        // Load all cars without filters
+        const result = await fetchCars({})
+        const carsData = result.data
+        setCars(carsData) // Store cars in the service
+        setCarsState(carsData) // Initially display all cars
 
-        // Client-side filtering for multiple brands and body types
-        const filteredCars = result.filter((car) => {
-          // If no brands selected, include all cars
-          const brandMatch = selectedBrands.length === 0 || selectedBrands.includes(car.brand)
+        // Extract unique brands and body types
+        const uniqueBrands: string[] = Array.from(new Set(carsData.map((car: Car) => car.brand_name)))
+        const uniqueBodyTypes: string[] = Array.from(new Set(carsData.map((car: Car) => car.bodywork)))
 
-          // If no body types selected, include all cars
-          const bodyTypeMatch = selectedBodyTypes.length === 0 || selectedBodyTypes.includes(car.bodyType)
-
-          return brandMatch && bodyTypeMatch
-        })
-
-        setCars(filteredCars)
+        setBrands(uniqueBrands)
+        setBodyTypes(uniqueBodyTypes)
       } catch (error) {
         console.error("Error fetching cars:", error)
       } finally {
@@ -88,56 +71,48 @@ export default function AutosPage() {
     }
 
     loadCars()
-  }, [selectedBrands, priceRange, selectedBodyTypes])
+  }, [])
+
+  useEffect(() => {
+    // Apply filters on the frontend
+    const allCars = getCars()
+    const filteredCars = allCars.filter((car) => {
+      const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(car.brand_name)
+      const matchesBodyType = selectedBodyTypes.length === 0 || selectedBodyTypes.includes(car.bodywork)
+      const matchesPrice = car.sale_price >= priceRange[0] && car.sale_price <= priceRange[1]
+      return matchesBrand && matchesBodyType && matchesPrice
+    })
+
+    setCarsState(filteredCars)
+  }, [selectedBrands, selectedBodyTypes, priceRange])
 
   const handleBrandSelect = (brand: string) => {
-    let newSelectedBrands: string[]
-
-    if (selectedBrands.includes(brand)) {
-      // Remove brand if already selected
-      newSelectedBrands = selectedBrands.filter((b) => b !== brand)
-    } else {
-      // Add brand if not already selected
-      newSelectedBrands = [...selectedBrands, brand]
-    }
+    const newSelectedBrands = selectedBrands.includes(brand)
+      ? selectedBrands.filter((b) => b !== brand)
+      : [...selectedBrands, brand]
 
     setSelectedBrands(newSelectedBrands)
     updateUrlParams(newSelectedBrands, selectedBodyTypes)
   }
 
   const handleBodyTypeSelect = (bodyType: string) => {
-    let newSelectedBodyTypes: string[]
-
-    if (selectedBodyTypes.includes(bodyType)) {
-      // Remove body type if already selected
-      newSelectedBodyTypes = selectedBodyTypes.filter((b) => b !== bodyType)
-    } else {
-      // Add body type if not already selected
-      newSelectedBodyTypes = [...selectedBodyTypes, bodyType]
-    }
+    const newSelectedBodyTypes = selectedBodyTypes.includes(bodyType)
+      ? selectedBodyTypes.filter((b) => b !== bodyType)
+      : [...selectedBodyTypes, bodyType]
 
     setSelectedBodyTypes(newSelectedBodyTypes)
     updateUrlParams(selectedBrands, newSelectedBodyTypes)
   }
 
-  // Helper function to update URL parameters
   const updateUrlParams = (brands: string[], bodyTypes: string[]) => {
     const params = new URLSearchParams()
 
-    // Add each brand as a separate marca parameter
-    brands.forEach((brand) => {
-      params.append("marca", brand)
-    })
-
-    // Add each body type as a separate carroceria parameter
-    bodyTypes.forEach((bodyType) => {
-      params.append("carroceria", bodyType)
-    })
+    brands.forEach((brand) => params.append("marca", brand))
+    bodyTypes.forEach((bodyType) => params.append("carroceria", bodyType))
 
     router.push(`/autos${params.toString() ? `?${params.toString()}` : ""}`)
   }
 
-  // Clear all filters
   const clearFilters = () => {
     setSelectedBrands([])
     setSelectedBodyTypes([])
@@ -164,7 +139,7 @@ export default function AutosPage() {
 
       <div className="p-4 space-y-6 md:container md:mx-auto md:pt-8">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-light mb-6 md:text-3xl md:block">Catálogo de Autos</h1>
+          <h1 className="text-2xl mb-1 md:text-3xl md:block font-extrabold">Catálogo de Autos</h1>
 
           {(selectedBrands.length > 0 || selectedBodyTypes.length > 0) && (
             <Button variant="ghost" size="sm" onClick={clearFilters} className="text-gray-400 hover:text-white">
@@ -188,24 +163,10 @@ export default function AutosPage() {
                       : "bg-black bg-opacity-40 hover:bg-opacity-60"
                   }`}
                 >
-                  {brand}
+                  {capitalize(brand)}
                 </button>
               ))}
             </div>
-
-            {selectedBrands.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-2">
-                <p className="text-xs text-gray-400">Seleccionados:</p>
-                {selectedBrands.map((brand) => (
-                  <span key={brand} className="text-xs bg-white/10 px-2 py-1 rounded-full flex items-center">
-                    {brand}
-                    <button onClick={() => handleBrandSelect(brand)} className="ml-1 text-gray-400 hover:text-white">
-                      <X className="h-3 w-3" />
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
           </div>
 
           <div>
@@ -240,24 +201,10 @@ export default function AutosPage() {
                       : "bg-black bg-opacity-40 hover:bg-opacity-60"
                   }`}
                 >
-                  {type}
+                  {capitalize(type)}
                 </button>
               ))}
             </div>
-
-            {selectedBodyTypes.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-2">
-                <p className="text-xs text-gray-400">Seleccionados:</p>
-                {selectedBodyTypes.map((type) => (
-                  <span key={type} className="text-xs bg-white/10 px-2 py-1 rounded-full flex items-center">
-                    {type}
-                    <button onClick={() => handleBodyTypeSelect(type)} className="ml-1 text-gray-400 hover:text-white">
-                      <X className="h-3 w-3" />
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
           </div>
         </div>
 
@@ -278,22 +225,22 @@ export default function AutosPage() {
                     <div className="relative">
                       <div className="aspect-[4/3] relative rounded-t-lg overflow-hidden">
                         <Image
-                          src={car.imageUrl || "/placeholder.svg?height=300&width=400"}
+                          src={car.images[0] || "/placeholder.svg?height=300&width=400"}
                           alt={car.model}
                           fill
                           className="object-cover"
                         />
                       </div>
                       <div className="absolute bottom-2 right-2 bg-black/70 backdrop-blur-sm px-3 py-1 rounded">
-                        <p className="text-white font-medium">${car.price.toLocaleString()}</p>
+                        <p className="text-white font-medium">${parseInt(car.sale_price).toLocaleString()}</p>
                       </div>
                     </div>
                     <div className="p-4">
                       <h3 className="font-medium text-lg">
-                        {car.brand} {car.model}
+                        {car.brand_name} {car.model}
                       </h3>
                       <p className="text-sm text-gray-400">
-                        {car.engine} • {car.year} • {car.bodyType}
+                        {car.version} • {car.year} • {car.bodywork}
                       </p>
                     </div>
                   </Link>
