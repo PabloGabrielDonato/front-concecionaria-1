@@ -16,7 +16,7 @@ export default function Home() {
         
         <div className="space-y-8">
           <div className="clean-card rounded-lg p-6">
-            <div className="flex gap-3 justify-around overflow-x-auto pb-2">
+            <div className="flex gap-3 justify-around overflow-x-auto pb-2 ">
               {["Chevrolet", "Toyota", "Nissan", "Ford", "BMW", "Audi"].map((brand) => (
                 <Link
                   key={brand}
@@ -35,7 +35,7 @@ export default function Home() {
                     hover:bg-amber-500 hover:text-black transition-colors"
                 >
                   <Image
-                    src={`/${brand.toLowerCase()}.svg`} // Asegúrate de tener las imágenes en la carpeta /public
+                    src={`/logos-marcas/${brand.toLowerCase()}.svg`} // Asegúrate de tener las imágenes en la carpeta /public
                     alt={`Logo de ${brand}`}
                     width={40} // Ajusta el tamaño del logo
                     height={40}
