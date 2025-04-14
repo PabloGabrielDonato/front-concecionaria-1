@@ -23,8 +23,8 @@ export default function CarDetailPage({ params }: { params: Promise<{ id: string
       setLoading(true)
       try {
         const result = await fetchCarById(id) // Usa `id` directamente
-        setCar(result)
-      } catch (error) {
+          setCar(result)
+              } catch (error) {
         console.error("Error fetching car details:", error)
       } finally {
         setLoading(false)
@@ -33,6 +33,12 @@ export default function CarDetailPage({ params }: { params: Promise<{ id: string
 
     loadCar()
   }, [id])
+
+  useEffect(() => {
+    if (car) {
+      document.title = `CPM Autos | ${car.brand_name} ${car.model}`
+    }
+  }, [car])
 
   if (loading) {
     return (
@@ -54,31 +60,41 @@ export default function CarDetailPage({ params }: { params: Promise<{ id: string
   }
 
   return (
-    <main className="flex flex-col min-h-screen pb-16 md:pb-0">
+    <main className="flex flex-col pb-8 md:pb-0">
       {isMobile && (
         <div className="flex items-center p-4 bg-black bg-opacity-80 backdrop-blur-md">
+          <div className="flex w-1/3">
           <Link href="/autos">
             <Button variant="ghost" size="icon" className="mr-2">
               <ChevronLeft className="h-5 w-5" />
             </Button>
           </Link>
-          <Link href="/" className="flex items-center justify-center w-full">
-            <div className="relative h-8">
-              <span className="gold-gradient text-xl">GPM</span>
-            </div>
-          </Link>
-        </div>
+          </div>
+          <Link href="/" className="flex items-center justify-center w-1/3">
+          <div className="relative h-8">
+            <img
+              src="/logo.svg"
+              alt="Logo"
+              className="h-full object-contain"
+            />
+          </div>
+        </Link>
+        <span className="p-8 flex w-1/3"/>
+      </div>
       )}
 
       <div className="p-4 space-y-6 md:container md:mx-auto md:pt-8">
         <h1 className="text-2xl font-light uppercase mb-4 md:text-3xl">
           {car.brand_name} {car.model}
+          <p className="text-sm text-gray-400">
+            {car.version} • {car.year} • {car.bodywork}
+          </p>
         </h1>
 
         <div className="md:flex md:gap-8">
           <div className="md:w-3/5">
             <div className="aspect-[4/3] relative rounded-lg overflow-hidden mb-6">
-              <Carousel autoPlay={true} infiniteLoop={true} showThumbs={false} showStatus={false} showIndicators={false}>
+              <Carousel autoPlay={true} infiniteLoop={true} showThumbs={false} showStatus={false}>
                 {car.images.map((image, index) => (
                   <div key={index} className="relative aspect-[4/3]">
                     <Image
@@ -101,8 +117,8 @@ export default function CarDetailPage({ params }: { params: Promise<{ id: string
                   <p className="font-medium">{car.brand_name}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400 text-sm">Modelo</p>
-                  <p className="font-medium">{car.model}</p>
+                  <p className="text-gray-400 text-sm">Versión</p>
+                  <p className="font-medium">{car.version}</p>
                 </div>
                 <div>
                   <p className="text-gray-400 text-sm">Año</p>
@@ -112,11 +128,19 @@ export default function CarDetailPage({ params }: { params: Promise<{ id: string
                   <p className="text-gray-400 text-sm">Carrocería</p>
                   <p className="font-medium">{car.bodywork}</p>
                 </div>
+                <div>
+                  <p className="text-gray-400 text-sm">Modelo</p>
+                  <p className="font-medium">{car.model}</p>
+                </div>
+                <div>
+                  <p className="text-gray-400 text-sm">Kilometraje</p>
+                  <p className="font-medium">{car.mileage_at_sale.toLocaleString()} km</p>
+                </div>
               </div>
 
-              <div className="pt-2">
-                <h2 className="text-2xl font-light mb-1">$ {parseInt(car.sale_price).toLocaleString()}</h2>
-                <p className="text-xs text-gray-400">Precio sujeto a modificación</p>
+              <div className="pt-2 bg-slate-900 bg-opacity-10 backdrop-blur-md rounded-lg p-4 flex flex-col items-center">
+                <h2 className="text-3xl font-semibold mb-1">$ {parseInt(car.sale_price).toLocaleString()}</h2>
+                <p className="text-xs text-gray-500">Precio sujeto a modificación</p>
               </div>
             </div>
 
