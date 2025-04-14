@@ -75,7 +75,7 @@ export default function AutosPage() {
 
   useEffect(() => {
     // Apply filters on the frontend
-    const allCars = getCars()
+    const allCars = getCars().data || []
     const filteredCars = allCars.filter((car) => {
       const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(car.brand_name)
       const matchesBodyType = selectedBodyTypes.length === 0 || selectedBodyTypes.includes(car.bodywork)
