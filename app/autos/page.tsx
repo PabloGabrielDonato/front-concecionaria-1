@@ -122,19 +122,27 @@ export default function AutosPage() {
 
   return (
     <main className="flex flex-col min-h-screen pb-16 md:pb-0">
+    
       {isMobile && (
         <div className="flex items-center p-4 bg-black bg-opacity-80 backdrop-blur-md">
+          <div className="flex w-1/3">
           <Link href="/">
             <Button variant="ghost" size="icon" className="mr-2">
               <ChevronLeft className="h-5 w-5" />
             </Button>
           </Link>
-          <Link href="/" className="flex items-center justify-center w-full">
+          </div>
+          <Link href="/" className="flex items-center justify-center w-1/3">
             <div className="relative h-8">
-              <span className="gold-gradient text-xl">GPM</span>
+              <img
+                src="/logo.svg"
+                alt="Logo"
+                className="h-full object-contain"
+              />
             </div>
           </Link>
-        </div>
+        <span className="p-8 flex w-1/3"/>
+      </div>
       )}
 
       <div className="p-4 space-y-6 md:container md:mx-auto md:pt-8">

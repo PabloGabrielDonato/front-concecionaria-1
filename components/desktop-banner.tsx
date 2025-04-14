@@ -20,7 +20,7 @@ export default function DesktopBanner() {
             <Link className="text-white" href="/autos">Ver Stock</Link>
           </Button>
           <Button asChild variant="outline" className="border-white text-white hover:bg-amber-500/10">
-            <Link href="/contacto">Contactanos</Link>
+            <Link href="/nosotros">Nosotros</Link>
           </Button>
         </div>
       </div>

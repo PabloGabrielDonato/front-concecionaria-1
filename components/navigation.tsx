@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useMobile } from "@/hooks/use-mobile"
 
-export default function Navigation() {
+export default function   Navigation() {
   const pathname = usePathname()
   const isMobile = useMobile()
 
@@ -25,11 +25,6 @@ export default function Navigation() {
       name: "Nosotros",
       href: "/nosotros",
       icon: Users,
-    },
-    {
-      name: "Contacto",
-      href: "/contacto",
-      icon: MessageCircle,
     },
   ]
 
@@ -62,7 +57,7 @@ export default function Navigation() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center">
-            <img src="/logo.png" alt="Logo" className="h-8 w-auto" />
+            <img src="/logo.svg" alt="Logo" className="h-8 w-auto" />
           </Link>
 
           <nav className="flex items-center space-x-8">
