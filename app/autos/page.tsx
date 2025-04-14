@@ -33,6 +33,7 @@ export default function AutosPage() {
 
   const [brands, setBrands] = useState<string[]>([])
   const [bodyTypes, setBodyTypes] = useState<string[]>([])
+  const [sortBy, setSortBy] = useState<string>(""); // Estado inicial vacío
 
   useEffect(() => {
     const marcaParam = searchParams.getAll("marca")
@@ -53,8 +54,7 @@ export default function AutosPage() {
       try {
         // Load all cars without filters
         const result = await fetchCars({})
-        const carsData = result.data
-        setCars(carsData) // Store cars in the service
+        const carsData = result
         setCarsState(carsData) // Initially display all cars
 
         // Extract unique brands and body types
@@ -75,7 +75,8 @@ export default function AutosPage() {
 
   useEffect(() => {
     // Apply filters on the frontend
-    const allCars = getCars().data || []
+    const allCars = getCars()
+    console.log("All cars:", allCars)
     const filteredCars = allCars.filter((car) => {
       const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(car.brand_name)
       const matchesBodyType = selectedBodyTypes.length === 0 || selectedBodyTypes.includes(car.bodywork)
@@ -83,8 +84,28 @@ export default function AutosPage() {
       return matchesBrand && matchesBodyType && matchesPrice
     })
 
-    setCarsState(filteredCars)
-  }, [selectedBrands, selectedBodyTypes, priceRange])
+    const sortedCars = sortCars(filteredCars, sortBy)
+    setCarsState(sortedCars)
+  }, [selectedBrands, selectedBodyTypes, priceRange, sortBy])
+
+  const sortCars = (cars: Car[], criterion: string) => {
+    switch (criterion) {
+      case "price":
+        return [...cars].sort((a, b) => a.sale_price - b.sale_price)
+      case "brand":
+        return [...cars].sort((a, b) => a.brand_name.localeCompare(b.brand_name))
+      case "added":
+        return [...cars].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      case "mileage":
+        return [...cars].sort((a, b) => a.mileage - b.mileage)
+      default:
+        return cars
+    }
+  }
+
+  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortBy(event.target.value)
+  }
 
   const handleBrandSelect = (brand: string) => {
     const newSelectedBrands = selectedBrands.includes(brand)
@@ -116,7 +137,7 @@ export default function AutosPage() {
   const clearFilters = () => {
     setSelectedBrands([])
     setSelectedBodyTypes([])
-    setPriceRange([15000000, 29000000])
+    setPriceRange([4000000, 100000000])
     router.push("/autos")
   }
 
@@ -149,12 +170,30 @@ export default function AutosPage() {
         <div className="flex justify-between items-center">
           <h1 className="text-2xl mb-1 md:text-3xl md:block font-extrabold">Catálogo de Autos</h1>
 
-          {(selectedBrands.length > 0 || selectedBodyTypes.length > 0) && (
-            <Button variant="ghost" size="sm" onClick={clearFilters} className="text-gray-400 hover:text-white">
-              Limpiar filtros
-              <X className="ml-2 h-4 w-4" />
-            </Button>
-          )}
+          <div className="flex items-center space-x-4">
+            {(selectedBrands.length > 0 || selectedBodyTypes.length > 0) && (
+              <Button variant="ghost" size="sm" onClick={clearFilters} className="text-gray-400 hover:text-white">
+                Limpiar filtros
+                <X className="ml-2 h-4 w-4" />
+              </Button>
+            )}
+
+            <select
+              value={sortBy}
+              onChange={handleSortChange}
+              className="bg-black text-white px-4 py-2 rounded-sm"
+            >
+              <option value="" disabled>
+                Ordenar vehículos
+              </option>
+              <option value="price">Ordenar por Precio</option>
+              <option value="brand">Ordenar por Marca</option>
+              <option value="added">Ordenar por Añadido</option>
+              <option value="mileage">Ordenar por Kilometraje</option>
+            </select>
+
+            
+          </div>
         </div>
 
         <div className="clean-card rounded-lg p-5 space-y-6">
@@ -246,6 +285,9 @@ export default function AutosPage() {
                     <div className="p-4">
                       <h3 className="font-medium text-lg">
                         {car.brand_name} {car.model}
+                        <span className="font-light text-sm text-gray-500 ml-4">
+                          {car.mileage_at_sale.toLocaleString()} km
+                        </span>
                       </h3>
                       <p className="text-sm text-gray-400">
                         {car.version} • {car.year} • {car.bodywork}
