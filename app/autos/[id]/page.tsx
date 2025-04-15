@@ -147,7 +147,11 @@ export default function CarDetailPage({ params }: { params: Promise<{ id: string
               </div>
 
               <div className="pt-2 bg-slate-900 bg-opacity-10 backdrop-blur-md rounded-lg p-4 flex flex-col items-center">
-                <h2 className="text-3xl font-semibold mb-1">$ {parseInt(car.sale_price).toLocaleString()}</h2>
+                <h2 className="text-3xl font-semibold mb-1">
+                  {isNaN(parseInt(car.sale_price)) 
+                    ? "Consultar precio" 
+                    : `$ ${parseInt(car.sale_price).toLocaleString()}`}
+                </h2>
                 <p className="text-xs text-gray-500">Precio sujeto a modificación</p>
               </div>
             </div>
