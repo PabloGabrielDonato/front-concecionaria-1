@@ -36,19 +36,6 @@ export default function AutosPage() {
   const [sortBy, setSortBy] = useState<string>(""); // Estado inicial vacío
 
   useEffect(() => {
-    const marcaParam = searchParams.getAll("marca")
-    const carroceriaParam = searchParams.getAll("carroceria")
-
-    if (marcaParam.length > 0) {
-      setSelectedBrands(marcaParam)
-    }
-
-    if (carroceriaParam.length > 0) {
-      setSelectedBodyTypes(carroceriaParam)
-    }
-  }, [searchParams])
-
-  useEffect(() => {
     const loadCars = async () => {
       setLoading(true)
       try {
@@ -63,6 +50,23 @@ export default function AutosPage() {
 
         setBrands(uniqueBrands)
         setBodyTypes(uniqueBodyTypes)
+
+        // Apply filters based on URL parameters
+        const marcaParam = searchParams.getAll("marca")
+        const carroceriaParam = searchParams.getAll("carroceria")
+
+        // Update selected brands and body types from URL parameters
+        setSelectedBrands(marcaParam)
+        setSelectedBodyTypes(carroceriaParam)
+
+        if (marcaParam.length > 0 || carroceriaParam.length > 0) {
+          const filteredCars = carsData.filter((car) => {
+            const matchesBrand = marcaParam.length === 0 || marcaParam.includes(car.brand_name)
+            const matchesBodyType = carroceriaParam.length === 0 || carroceriaParam.includes(car.bodywork)
+            return matchesBrand && matchesBodyType
+          })
+          setCarsState(filteredCars)
+        }
       } catch (error) {
         console.error("Error fetching cars:", error)
       } finally {
@@ -71,7 +75,7 @@ export default function AutosPage() {
     }
 
     loadCars()
-  }, [])
+  }, [searchParams])
 
   useEffect(() => {
     // Apply filters on the frontend

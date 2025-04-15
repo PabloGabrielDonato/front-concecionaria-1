@@ -11,15 +11,25 @@ import DesktopBanner from "@/components/desktop-banner"
 
 export default function Home() {
   const [latestCars, setLatestCars] = useState<Car[]>([])
+  const [brands, setBrands] = useState<string[]>([])
 
   useEffect(() => {
     async function loadCars() {
       await fetchCars()
       const cars = getCars()
       setLatestCars(cars.slice(-3)) // Obtén los últimos 3 autos
+
+      // Extraer marcas únicas de los autos y filtrar las que contengan símbolos, puntos o espacios
+      const uniqueBrands = Array.from(
+        new Set(cars.map((car) => car.brand_name))
+      ).filter((brand) => /^[a-zA-Z]+$/.test(brand)) // Solo marcas con letras
+      setBrands(uniqueBrands)
     }
     loadCars()
   }, [])
+
+  // Función para capitalizar la primera letra de una marca
+  const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
 
   return (
     <main className="flex flex-col min-h-screen pb-16 md:pb-0">
@@ -33,7 +43,7 @@ export default function Home() {
         <div className="space-y-8">
           <div className="clean-card rounded-lg p-6">
             <div className="flex gap-3 justify-around overflow-x-auto pb-2 ">
-              {["Chevrolet", "Toyota", "Nissan", "Ford", "BMW", "Audi"].map((brand) => (
+              {brands.map((brand) => (
                 <Link
                   key={brand}
                   href={`/autos?marca=${brand}`}
@@ -47,7 +57,7 @@ export default function Home() {
                     bg-black bg-opacity-40
                     rounded-full
                     border-2 border-amber-500
-                    text-xs whitespace-nowrap 
+                    text-[0.65rem] whitespace-nowrap 
                     hover:bg-amber-500 hover:text-black transition-colors"
                 >
                   <Image
@@ -57,7 +67,7 @@ export default function Home() {
                     height={40}
                     className="filter invert group-hover:invert-0"
                   />
-                  {brand}
+                  {capitalize(brand)}
                 </Link>
               ))}
             </div>
