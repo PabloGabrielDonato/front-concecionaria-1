@@ -1,3 +1,8 @@
+"use client"
+
+import { useEffect, useState } from "react"
+import { fetchCars, getCars } from "@/lib/api/cars-service"
+import type { Car } from "@/lib/domain/models/car"
 import Image from "next/image"
 import Link from "next/link"
 import WhatsAppFab from "@/components/whatsapp-fab"
@@ -5,6 +10,17 @@ import Header from "@/components/header"
 import DesktopBanner from "@/components/desktop-banner"
 
 export default function Home() {
+  const [latestCars, setLatestCars] = useState<Car[]>([])
+
+  useEffect(() => {
+    async function loadCars() {
+      await fetchCars()
+      const cars = getCars()
+      setLatestCars(cars.slice(-3)) // Obtén los últimos 3 autos
+    }
+    loadCars()
+  }, [])
+
   return (
     <main className="flex flex-col min-h-screen pb-16 md:pb-0">
       <div className="md:hidden">
@@ -35,11 +51,11 @@ export default function Home() {
                     hover:bg-amber-500 hover:text-black transition-colors"
                 >
                   <Image
-                    src={`/logos-marcas/${brand.toLowerCase()}.svg`} // Asegúrate de tener las imágenes en la carpeta /public
+                    src={`/logos-marcas/${brand.toLowerCase()}.svg`}
                     alt={`Logo de ${brand}`}
-                    width={40} // Ajusta el tamaño del logo
+                    width={40}
                     height={40}
-                    className="filter invert group-hover:invert-0" // Cambia a negro al hacer hover
+                    className="filter invert group-hover:invert-0"
                   />
                   {brand}
                 </Link>
@@ -50,24 +66,24 @@ export default function Home() {
           <div>
             <h2 className="text-lg font-light mb-4">Ultimos ingresos</h2>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {[1, 2, 3].map((item) => (
+              {latestCars.map((car) => (
                 <Link
-                  key={item}
-                  href={`/autos/${item}`}
+                  key={car.id}
+                  href={`/autos/${car.id}`}
                   className="block clean-card rounded-lg overflow-hidden subtle-hover"
                 >
                   <div className="aspect-video relative">
                     <Image
-                      src="/cruze.jpeg"
-                      alt="Auto destacado"
+                      src={car.images[0] || "/placeholder.jpg"} // Usa una imagen por defecto si no hay imagen
+                      alt={`Imagen de ${car.model}`}
                       fill
                       className="object-cover"
                     />
                   </div>
                   <div className="p-4">
-                    <h3 className="font-medium">Chevrolet Cruze - 1.8 LT</h3>
-                    <p className="text-gray-400 text-sm">2013 • Automático • Gasolina</p>
-                    <p className="font-medium mt-2">$18.989.900</p>
+                    <h3 className="font-medium">{`${car.brand_name} ${car.model}`}</h3>
+                    <p className="text-gray-400 text-sm">{`${car.version} • ${car.model} • ${car.year}`}</p>
+                    <p className="font-medium mt-2">{`$${car.sale_price.toLocaleString()}`}</p>
                   </div>
                 </Link>
               ))}
