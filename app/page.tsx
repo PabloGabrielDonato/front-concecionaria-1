@@ -65,7 +65,7 @@ export default function Home() {
                     alt={`Logo de ${brand}`}
                     width={40}
                     height={40}
-                    className="filter invert group-hover:invert-0"
+                    className="filter invert group-hover:invert-0 max-h-10 min-h10"
                   />
                   {capitalize(brand)}
                 </Link>
