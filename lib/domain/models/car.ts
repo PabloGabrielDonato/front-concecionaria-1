@@ -1,13 +1,12 @@
 export interface Car {
-  id: string
-  brand: string
+  id: number
+  brand_name: string
   model: string
-  year: number
-  price: number
-  engine: string
-  bodyType: string
-  imageUrl?: string
-  description?: string
-  features: string[]
+  bodywork: string
+  year: string
+  sale_price: string
+  mileage_at_sale: number
+  version: string
+  images: string[]
 }
 

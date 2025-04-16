@@ -4,6 +4,8 @@ import "./globals.css"
 import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import Navigation from "@/components/navigation"
+import ContactoPage from '@/app/contacto/page';
+import Footer from "@/components/footer"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -25,6 +27,8 @@ export default function RootLayout({
           <div className="flex flex-col min-h-screen bg-gradient-to-b from-black to-gray-900 text-white">
             <Navigation />
             <div className="md:pt-16">{children}</div>
+            <ContactoPage />
+            <Footer />
           </div>
         </ThemeProvider>
       </body>

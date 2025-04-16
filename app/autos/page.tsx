@@ -7,79 +7,66 @@ import { ChevronLeft, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { useSearchParams, useRouter } from "next/navigation"
-import { fetchCars, fetchBodyTypes } from "@/lib/api/cars-service"
+import { fetchCars, setCars, getCars } from "@/lib/api/cars-service"
 import type { Car } from "@/lib/domain/models/car"
 import WhatsAppFab from "@/components/whatsapp-fab"
 import { useMobile } from "@/hooks/use-mobile"
+
+const capitalize = (text: string) => {
+  return text
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
 
 export default function AutosPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const isMobile = useMobile()
-  const [cars, setCars] = useState<Car[]>([])
+  const [cars, setCarsState] = useState<Car[]>([])
   const [loading, setLoading] = useState(true)
-  const [priceRange, setPriceRange] = useState([15000000, 29000000])
+  const [priceRange, setPriceRange] = useState([4000000, 100000000])
 
-  // Update state to handle arrays of selected values
   const [selectedBrands, setSelectedBrands] = useState<string[]>([])
-  const [bodyTypes, setBodyTypes] = useState<string[]>([])
   const [selectedBodyTypes, setSelectedBodyTypes] = useState<string[]>([])
 
-  const brands = ["Alfa Romeo", "Audi", "BMW", "Chevrolet", "Nissan", "Toyota"]
-
-  // Parse URL parameters on initial load
-  useEffect(() => {
-    const marcaParam = searchParams.getAll("marca")
-    const carroceriaParam = searchParams.getAll("carroceria")
-
-    if (marcaParam.length > 0) {
-      setSelectedBrands(marcaParam)
-    }
-
-    if (carroceriaParam.length > 0) {
-      setSelectedBodyTypes(carroceriaParam)
-    }
-  }, [searchParams])
-
-  useEffect(() => {
-    // Cargar tipos de carrocería
-    const loadBodyTypes = async () => {
-      try {
-        const types = await fetchBodyTypes()
-        setBodyTypes(types)
-      } catch (error) {
-        console.error("Error fetching body types:", error)
-      }
-    }
-
-    loadBodyTypes()
-  }, [])
+  const [brands, setBrands] = useState<string[]>([])
+  const [bodyTypes, setBodyTypes] = useState<string[]>([])
+  const [sortBy, setSortBy] = useState<string>(""); // Estado inicial vacío
 
   useEffect(() => {
     const loadCars = async () => {
       setLoading(true)
       try {
-        // Fetch cars with no brand filter if none selected, otherwise filter by the selected brands
-        const result = await fetchCars({
-          brand: selectedBrands.length > 0 ? selectedBrands[0] : null, // API only supports one brand for now
-          minPrice: priceRange[0],
-          maxPrice: priceRange[1],
-          yearFrom: 2010,
-          bodyType: selectedBodyTypes.length > 0 ? selectedBodyTypes[0] : null, // API only supports one body type for now
-        })
+        // Load all cars without filters
+        const result = await fetchCars({})
+        const carsData = result
+        setCarsState(carsData) // Initially display all cars
 
-        // Client-side filtering for multiple brands and body types
-        const filteredCars = result.filter((car) => {
-          // If no brands selected, include all cars
-          const brandMatch = selectedBrands.length === 0 || selectedBrands.includes(car.brand)
+        // Extract unique brands and body types
+        const uniqueBrands: string[] = Array.from(new Set(carsData.map((car: Car) => car.brand_name)))
+        const uniqueBodyTypes: string[] = Array.from(new Set(carsData.map((car: Car) => car.bodywork)))
 
-          // If no body types selected, include all cars
-          const bodyTypeMatch = selectedBodyTypes.length === 0 || selectedBodyTypes.includes(car.bodyType)
+        setBrands(uniqueBrands)
+        setBodyTypes(uniqueBodyTypes)
 
-          return brandMatch && bodyTypeMatch
-        })
+        // Apply filters based on URL parameters
+        const marcaParam = searchParams.getAll("marca")
+        const carroceriaParam = searchParams.getAll("carroceria")
 
-        setCars(filteredCars)
+        // Update selected brands and body types from URL parameters
+        setSelectedBrands(marcaParam)
+        setSelectedBodyTypes(carroceriaParam)
+
+        if (marcaParam.length > 0 || carroceriaParam.length > 0) {
+          const filteredCars = carsData.filter((car) => {
+            const matchesBrand = marcaParam.length === 0 || marcaParam.includes(car.brand_name)
+            const matchesBodyType = carroceriaParam.length === 0 || carroceriaParam.includes(car.bodywork)
+            return matchesBrand && matchesBodyType
+          })
+          setCarsState(filteredCars)
+        }
       } catch (error) {
         console.error("Error fetching cars:", error)
       } finally {
@@ -88,90 +75,129 @@ export default function AutosPage() {
     }
 
     loadCars()
-  }, [selectedBrands, priceRange, selectedBodyTypes])
+  }, [searchParams])
+
+  useEffect(() => {
+    // Apply filters on the frontend
+    const allCars = getCars()
+    console.log("All cars:", allCars)
+    const filteredCars = allCars.filter((car) => {
+      const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(car.brand_name)
+      const matchesBodyType = selectedBodyTypes.length === 0 || selectedBodyTypes.includes(car.bodywork)
+      const matchesPrice = car.sale_price >= priceRange[0] && car.sale_price <= priceRange[1]
+      return matchesBrand && matchesBodyType && matchesPrice
+    })
+
+    const sortedCars = sortCars(filteredCars, sortBy)
+    setCarsState(sortedCars)
+  }, [selectedBrands, selectedBodyTypes, priceRange, sortBy])
+
+  const sortCars = (cars: Car[], criterion: string) => {
+    switch (criterion) {
+      case "price":
+        return [...cars].sort((a, b) => a.sale_price - b.sale_price)
+      case "brand":
+        return [...cars].sort((a, b) => a.brand_name.localeCompare(b.brand_name))
+      case "added":
+        return [...cars].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      case "mileage":
+        return [...cars].sort((a, b) => a.mileage - b.mileage)
+      default:
+        return cars
+    }
+  }
+
+  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortBy(event.target.value)
+  }
 
   const handleBrandSelect = (brand: string) => {
-    let newSelectedBrands: string[]
-
-    if (selectedBrands.includes(brand)) {
-      // Remove brand if already selected
-      newSelectedBrands = selectedBrands.filter((b) => b !== brand)
-    } else {
-      // Add brand if not already selected
-      newSelectedBrands = [...selectedBrands, brand]
-    }
+    const newSelectedBrands = selectedBrands.includes(brand)
+      ? selectedBrands.filter((b) => b !== brand)
+      : [...selectedBrands, brand]
 
     setSelectedBrands(newSelectedBrands)
     updateUrlParams(newSelectedBrands, selectedBodyTypes)
   }
 
   const handleBodyTypeSelect = (bodyType: string) => {
-    let newSelectedBodyTypes: string[]
-
-    if (selectedBodyTypes.includes(bodyType)) {
-      // Remove body type if already selected
-      newSelectedBodyTypes = selectedBodyTypes.filter((b) => b !== bodyType)
-    } else {
-      // Add body type if not already selected
-      newSelectedBodyTypes = [...selectedBodyTypes, bodyType]
-    }
+    const newSelectedBodyTypes = selectedBodyTypes.includes(bodyType)
+      ? selectedBodyTypes.filter((b) => b !== bodyType)
+      : [...selectedBodyTypes, bodyType]
 
     setSelectedBodyTypes(newSelectedBodyTypes)
     updateUrlParams(selectedBrands, newSelectedBodyTypes)
   }
 
-  // Helper function to update URL parameters
   const updateUrlParams = (brands: string[], bodyTypes: string[]) => {
     const params = new URLSearchParams()
 
-    // Add each brand as a separate marca parameter
-    brands.forEach((brand) => {
-      params.append("marca", brand)
-    })
-
-    // Add each body type as a separate carroceria parameter
-    bodyTypes.forEach((bodyType) => {
-      params.append("carroceria", bodyType)
-    })
+    brands.forEach((brand) => params.append("marca", brand))
+    bodyTypes.forEach((bodyType) => params.append("carroceria", bodyType))
 
     router.push(`/autos${params.toString() ? `?${params.toString()}` : ""}`)
   }
 
-  // Clear all filters
   const clearFilters = () => {
     setSelectedBrands([])
     setSelectedBodyTypes([])
-    setPriceRange([15000000, 29000000])
+    setPriceRange([4000000, 100000000])
     router.push("/autos")
   }
 
   return (
     <main className="flex flex-col min-h-screen pb-16 md:pb-0">
+    
       {isMobile && (
         <div className="flex items-center p-4 bg-black bg-opacity-80 backdrop-blur-md">
+          <div className="flex w-1/3">
           <Link href="/">
             <Button variant="ghost" size="icon" className="mr-2">
               <ChevronLeft className="h-5 w-5" />
             </Button>
           </Link>
-          <Link href="/" className="flex items-center justify-center w-full">
+          </div>
+          <Link href="/" className="flex items-center justify-center w-1/3">
             <div className="relative h-8">
-              <span className="gold-gradient text-xl">GPM</span>
+              <img
+                src="/logo.svg"
+                alt="Logo"
+                className="h-full object-contain"
+              />
             </div>
           </Link>
-        </div>
+        <span className="p-8 flex w-1/3"/>
+      </div>
       )}
 
       <div className="p-4 space-y-6 md:container md:mx-auto md:pt-8">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-light mb-6 md:text-3xl md:block">Catálogo de Autos</h1>
+          <h1 className="text-2xl mb-1 md:text-3xl md:block font-extrabold">Catálogo de Autos</h1>
 
-          {(selectedBrands.length > 0 || selectedBodyTypes.length > 0) && (
-            <Button variant="ghost" size="sm" onClick={clearFilters} className="text-gray-400 hover:text-white">
-              Limpiar filtros
-              <X className="ml-2 h-4 w-4" />
-            </Button>
-          )}
+          <div className="flex items-center space-x-4">
+            {(selectedBrands.length > 0 || selectedBodyTypes.length > 0) && (
+              <Button variant="ghost" size="sm" onClick={clearFilters} className="text-gray-400 hover:text-white">
+                Limpiar filtros
+                <X className="ml-2 h-4 w-4" />
+              </Button>
+            )}
+
+            <select
+              value={sortBy}
+              onChange={handleSortChange}
+              className="bg-black text-white px-4 py-2 rounded-sm"
+            >
+              <option value="" disabled>
+                Ordenar vehículos
+              </option>
+              <option value="price">Ordenar por Precio</option>
+              <option value="brand">Ordenar por Marca</option>
+              <option value="added">Ordenar por Añadido</option>
+              <option value="mileage">Ordenar por Kilometraje</option>
+            </select>
+
+            
+          </div>
         </div>
 
         <div className="clean-card rounded-lg p-5 space-y-6">
@@ -188,24 +214,10 @@ export default function AutosPage() {
                       : "bg-black bg-opacity-40 hover:bg-opacity-60"
                   }`}
                 >
-                  {brand}
+                  {capitalize(brand)}
                 </button>
               ))}
             </div>
-
-            {selectedBrands.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-2">
-                <p className="text-xs text-gray-400">Seleccionados:</p>
-                {selectedBrands.map((brand) => (
-                  <span key={brand} className="text-xs bg-white/10 px-2 py-1 rounded-full flex items-center">
-                    {brand}
-                    <button onClick={() => handleBrandSelect(brand)} className="ml-1 text-gray-400 hover:text-white">
-                      <X className="h-3 w-3" />
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
           </div>
 
           <div>
@@ -240,24 +252,10 @@ export default function AutosPage() {
                       : "bg-black bg-opacity-40 hover:bg-opacity-60"
                   }`}
                 >
-                  {type}
+                  {capitalize(type)}
                 </button>
               ))}
             </div>
-
-            {selectedBodyTypes.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-2">
-                <p className="text-xs text-gray-400">Seleccionados:</p>
-                {selectedBodyTypes.map((type) => (
-                  <span key={type} className="text-xs bg-white/10 px-2 py-1 rounded-full flex items-center">
-                    {type}
-                    <button onClick={() => handleBodyTypeSelect(type)} className="ml-1 text-gray-400 hover:text-white">
-                      <X className="h-3 w-3" />
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
           </div>
         </div>
 
@@ -278,22 +276,25 @@ export default function AutosPage() {
                     <div className="relative">
                       <div className="aspect-[4/3] relative rounded-t-lg overflow-hidden">
                         <Image
-                          src={car.imageUrl || "/placeholder.svg?height=300&width=400"}
+                          src={car.images[0] || "/placeholder.svg?height=300&width=400"}
                           alt={car.model}
                           fill
                           className="object-cover"
                         />
                       </div>
                       <div className="absolute bottom-2 right-2 bg-black/70 backdrop-blur-sm px-3 py-1 rounded">
-                        <p className="text-white font-medium">${car.price.toLocaleString()}</p>
+                        <p className="text-white font-medium">${parseInt(car.sale_price).toLocaleString()}</p>
                       </div>
                     </div>
                     <div className="p-4">
                       <h3 className="font-medium text-lg">
-                        {car.brand} {car.model}
+                        {car.brand_name} {car.model}
+                        <span className="font-light text-sm text-gray-500 ml-4">
+                          {car.mileage_at_sale.toLocaleString()} km
+                        </span>
                       </h3>
                       <p className="text-sm text-gray-400">
-                        {car.engine} • {car.year} • {car.bodyType}
+                        {car.version} • {car.year} • {car.bodywork}
                       </p>
                     </div>
                   </Link>

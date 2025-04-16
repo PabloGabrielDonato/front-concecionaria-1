@@ -24,7 +24,7 @@ export default function WhatsAppFab({
       target="_blank"
       rel="noopener noreferrer"
       className={cn(
-        "fixed bottom-20 right-4 z-50 flex items-center justify-center w-12 h-12 rounded-full bg-white text-black shadow-lg hover:bg-amber-500 transition-all duration-200",
+        "fixed bottom-24 right-10 z-50 flex items-center justify-center w-12 h-12 rounded-full bg-white text-black shadow-lg hover:bg-amber-500 transition-all duration-200",
         className,
       )}
     >
