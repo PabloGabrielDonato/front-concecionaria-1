@@ -1,6 +1,6 @@
 import type { Car } from "@/lib/domain/models/car"
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://cpmsistema.com.ar/api/v1"
 let cars: Car[] = []
 
 // Available body types
