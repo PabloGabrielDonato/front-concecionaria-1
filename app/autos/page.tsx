@@ -26,7 +26,7 @@ export default function AutosPage() {
   const isMobile = useMobile()
   const [cars, setCarsState] = useState<Car[]>([])
   const [loading, setLoading] = useState(true)
-  const [priceRange, setPriceRange] = useState([4000000, 100000000])
+  const [priceRange, setPriceRange] = useState([0, Infinity]) // Cambiar el rango inicial
 
   const [selectedBrands, setSelectedBrands] = useState<string[]>([])
   const [selectedBodyTypes, setSelectedBodyTypes] = useState<string[]>([])
@@ -141,7 +141,7 @@ export default function AutosPage() {
   const clearFilters = () => {
     setSelectedBrands([])
     setSelectedBodyTypes([])
-    setPriceRange([4000000, 100000000])
+    setPriceRange([2000000, Infinity])
     router.push("/autos")
   }
 
@@ -226,15 +226,18 @@ export default function AutosPage() {
               <Slider
                 defaultValue={priceRange}
                 value={priceRange}
-                min={4000000}
-                max={100000000}
+                min={0}
+                max={100000000} // Máximo del slider
                 step={1000000}
-                onValueChange={setPriceRange}
+                onValueChange={(value) => {
+                  // Si el valor máximo del slider es alcanzado, establece Infinity
+                  setPriceRange([value[0], value[1] === 100000000 ? Infinity : value[1]]);
+                }}
                 className="my-6"
               />
               <div className="flex justify-between text-sm text-gray-400">
-                <span>${(priceRange[0] / 1000000).toFixed(1)}M</span>
-                <span>${(priceRange[1] / 1000000).toFixed(1)}M</span>
+                <span>{priceRange[0] === 0 ? "Sin mínimo" : `$${(priceRange[0] / 1000000).toFixed(1)}M`}</span>
+                <span>{priceRange[1] === Infinity ? "Sin límite" : `$${(priceRange[1] / 1000000).toFixed(1)}M`}</span>
               </div>
             </div>
           </div>
