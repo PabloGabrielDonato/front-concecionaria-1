@@ -93,7 +93,7 @@ export default function Home() {
                   <div className="p-4">
                     <h3 className="font-medium">{`${car.brand_name} ${car.model}`}</h3>
                     <p className="text-gray-400 text-sm">{`${car.version} • ${car.model} • ${car.year}`}</p>
-                    <p className="font-medium mt-2">{`$${car.sale_price.toLocaleString()}`}</p>
+                    <p className="font-medium mt-2">{`$${parseInt(car.sale_price).toLocaleString()}`}</p>
                   </div>
                 </Link>
               ))}
