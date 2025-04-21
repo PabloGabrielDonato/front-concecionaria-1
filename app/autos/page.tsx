@@ -11,6 +11,7 @@ import { fetchCars, setCars, getCars } from "@/lib/api/cars-service"
 import type { Car } from "@/lib/domain/models/car"
 import WhatsAppFab from "@/components/whatsapp-fab"
 import { useMobile } from "@/hooks/use-mobile"
+import Fuse from "fuse.js"; // Importar Fuse.js
 
 const capitalize = (text: string) => {
   return text
@@ -26,7 +27,7 @@ export default function AutosPage() {
   const isMobile = useMobile()
   const [cars, setCarsState] = useState<Car[]>([])
   const [loading, setLoading] = useState(true)
-  const [priceRange, setPriceRange] = useState([4000000, 100000000])
+  const [priceRange, setPriceRange] = useState([0, Infinity]) // Cambiar el rango inicial
 
   const [selectedBrands, setSelectedBrands] = useState<string[]>([])
   const [selectedBodyTypes, setSelectedBodyTypes] = useState<string[]>([])
@@ -34,6 +35,7 @@ export default function AutosPage() {
   const [brands, setBrands] = useState<string[]>([])
   const [bodyTypes, setBodyTypes] = useState<string[]>([])
   const [sortBy, setSortBy] = useState<string>(""); // Estado inicial vacío
+  const [searchText, setSearchText] = useState(""); // Nuevo estado para el texto de búsqueda
 
   useEffect(() => {
     const loadCars = async () => {
@@ -78,19 +80,34 @@ export default function AutosPage() {
   }, [searchParams])
 
   useEffect(() => {
-    // Apply filters on the frontend
-    const allCars = getCars()
-    console.log("All cars:", allCars)
-    const filteredCars = allCars.filter((car) => {
-      const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(car.brand_name)
-      const matchesBodyType = selectedBodyTypes.length === 0 || selectedBodyTypes.includes(car.bodywork)
-      const matchesPrice = car.sale_price >= priceRange[0] && car.sale_price <= priceRange[1]
-      return matchesBrand && matchesBodyType && matchesPrice
-    })
+    // Crear un nuevo array con un campo combinado de marca y modelo
+    const carsWithCombinedFields = getCars().map((car) => ({
+      ...car,
+      combinedField: `${car.brand_name} ${car.model}`.toLowerCase(), // Campo combinado
+    }));
 
-    const sortedCars = sortCars(filteredCars, sortBy)
-    setCarsState(sortedCars)
-  }, [selectedBrands, selectedBodyTypes, priceRange, sortBy])
+    // Configuración de Fuse.js
+    const fuse = new Fuse(carsWithCombinedFields, {
+      keys: ["combinedField"], // Buscar en el campo combinado
+      threshold: 0.3, // Margen de error permitido
+    });
+
+    // Filtrar autos con Fuse.js solo si hay texto en el buscador
+    const filteredCars = searchText
+      ? fuse.search(searchText).map((result) => result.item)
+      : carsWithCombinedFields; // Si no hay texto, usa todos los autos
+
+    // Aplicar otros filtros (marca, carrocería, precio)
+    const finalFilteredCars = filteredCars.filter((car) => {
+      const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(car.brand_name);
+      const matchesBodyType = selectedBodyTypes.length === 0 || selectedBodyTypes.includes(car.bodywork);
+      const matchesPrice = car.sale_price >= priceRange[0] && car.sale_price <= priceRange[1];
+      return matchesBrand && matchesBodyType && matchesPrice;
+    });
+
+    const sortedCars = sortCars(finalFilteredCars, sortBy);
+    setCarsState(sortedCars);
+  }, [selectedBrands, selectedBodyTypes, priceRange, sortBy, searchText]); // Agregar searchText como dependencia
 
   const sortCars = (cars: Car[], criterion: string) => {
     switch (criterion) {
@@ -141,7 +158,8 @@ export default function AutosPage() {
   const clearFilters = () => {
     setSelectedBrands([])
     setSelectedBodyTypes([])
-    setPriceRange([4000000, 100000000])
+    setPriceRange([2000000, Infinity])
+    setSearchText("")
     router.push("/autos")
   }
 
@@ -202,6 +220,17 @@ export default function AutosPage() {
 
         <div className="clean-card rounded-lg p-5 space-y-6">
           <div>
+            <p className="text-sm text-gray-400 mb-3">Buscar:</p>
+            <input
+              type="text"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              placeholder="Buscar por marca o modelo"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
             <p className="text-sm text-gray-400 mb-3">Marca:</p>
             <div className="flex flex-wrap gap-2">
               {brands.map((brand) => (
@@ -226,15 +255,18 @@ export default function AutosPage() {
               <Slider
                 defaultValue={priceRange}
                 value={priceRange}
-                min={4000000}
-                max={100000000}
+                min={0}
+                max={100000000} // Máximo del slider
                 step={1000000}
-                onValueChange={setPriceRange}
+                onValueChange={(value) => {
+                  // Si el valor máximo del slider es alcanzado, establece Infinity
+                  setPriceRange([value[0], value[1] === 100000000 ? Infinity : value[1]]);
+                }}
                 className="my-6"
               />
               <div className="flex justify-between text-sm text-gray-400">
-                <span>${(priceRange[0] / 1000000).toFixed(1)}M</span>
-                <span>${(priceRange[1] / 1000000).toFixed(1)}M</span>
+                <span>{priceRange[0] === 0 ? "Sin mínimo" : `$${(priceRange[0] / 1000000).toFixed(1)}M`}</span>
+                <span>{priceRange[1] === Infinity ? "Sin límite" : `$${(priceRange[1] / 1000000).toFixed(1)}M`}</span>
               </div>
             </div>
           </div>
