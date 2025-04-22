@@ -5,11 +5,12 @@ import Image from "next/image"
 import Link from "next/link"
 import { ChevronLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { fetchCarById } from "@/lib/api/cars-service"
+import { fetchCarById, fetchCars } from "@/lib/api/cars-service"
 import type { Car } from "@/lib/domain/models/car"
 import { useMobile } from "@/hooks/use-mobile"
 import { Carousel } from "react-responsive-carousel"
 import "react-responsive-carousel/lib/styles/carousel.min.css"
+import RandomCarButton from "@/components/random-car-button"
 
 const handleContactClick = (phoneNumber: string, message: string) => {
   const formattedPhone = phoneNumber.replace(/\D/g, "");
@@ -23,6 +24,7 @@ export default function CarDetailPage({ params }: { params: Promise<{ id: string
   const { id } = use(params) // Desenvuelve la promesa de `params`
 
   const [car, setCar] = useState<Car | null>(null)
+  const [cars, setCars] = useState<Car[]>([]) // Estado para almacenar el listado completo de autos
   const [loading, setLoading] = useState(true)
   const isMobile = useMobile()
 
@@ -31,15 +33,25 @@ export default function CarDetailPage({ params }: { params: Promise<{ id: string
       setLoading(true)
       try {
         const result = await fetchCarById(id) // Usa `id` directamente
-          setCar(result)
-              } catch (error) {
+        setCar(result)
+      } catch (error) {
         console.error("Error fetching car details:", error)
       } finally {
         setLoading(false)
       }
     }
 
+    const loadCars = async () => {
+      try {
+        const allCars = await fetchCars() // Obtén el listado completo de autos
+        setCars(allCars)
+      } catch (error) {
+        console.error("Error fetching cars list:", error)
+      }
+    }
+
     loadCar()
+    loadCars()
   }, [id])
 
   useEffect(() => {
@@ -72,23 +84,23 @@ export default function CarDetailPage({ params }: { params: Promise<{ id: string
       {isMobile && (
         <div className="flex items-center p-4 bg-black bg-opacity-80 backdrop-blur-md">
           <div className="flex w-1/3">
-          <Link href="/autos">
-            <Button variant="ghost" size="icon" className="mr-2">
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
-          </Link>
+            <Link href="/autos">
+              <Button variant="ghost" size="icon" className="mr-2">
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+            </Link>
           </div>
           <Link href="/" className="flex items-center justify-center w-1/3">
-          <div className="relative h-8">
-            <img
-              src="/logo.svg"
-              alt="Logo"
-              className="h-full object-contain"
-            />
-          </div>
-        </Link>
-        <span className="p-8 flex w-1/3"/>
-      </div>
+            <div className="relative h-8">
+              <img
+                src="/logo.svg"
+                alt="Logo"
+                className="h-full object-contain"
+              />
+            </div>
+          </Link>
+          <span className="p-8 flex w-1/3" />
+        </div>
       )}
 
       <div className="p-4 space-y-6 md:container md:mx-auto md:pt-8">
@@ -184,6 +196,8 @@ export default function CarDetailPage({ params }: { params: Promise<{ id: string
           </div>
         </div>
       </div>
+
+      <RandomCarButton cars={cars} />
     </main>
   )
 }

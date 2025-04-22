@@ -10,6 +10,7 @@ import { useSearchParams, useRouter } from "next/navigation"
 import { fetchCars, setCars, getCars } from "@/lib/api/cars-service"
 import type { Car } from "@/lib/domain/models/car"
 import WhatsAppFab from "@/components/whatsapp-fab"
+import RandomCarButton from "@/components/random-car-button"
 import { useMobile } from "@/hooks/use-mobile"
 import Fuse from "fuse.js"; // Importar Fuse.js
 
@@ -189,7 +190,7 @@ export default function AutosPage() {
       )}
 
       <div className="p-4 space-y-6 md:container md:mx-auto md:pt-8">
-        <div className="flex justify-between items-center">
+        <div className="flex items-center flex-col md:flex-row justify-between ">
           <h1 className="text-2xl mb-1 md:text-3xl md:block font-extrabold">Catálogo de Autos</h1>
 
           <div className="flex items-center space-x-4">
@@ -341,7 +342,8 @@ export default function AutosPage() {
         )}
       </div>
 
-      <WhatsAppFab phoneNumber="+54 9 11 7368-2567" message="Hola, estoy interesado en conocer más sobre sus vehículos" />
+        <WhatsAppFab phoneNumber="+54 9 11 7368-2567" message="Hola, estoy interesado en conocer más sobre sus vehículos" />
+        <RandomCarButton cars={cars} />
     </main>
   )
 }
