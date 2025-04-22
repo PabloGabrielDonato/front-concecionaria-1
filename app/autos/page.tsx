@@ -190,7 +190,7 @@ export default function AutosPage() {
       )}
 
       <div className="p-4 space-y-6 md:container md:mx-auto md:pt-8">
-        <div className="flex justify-between items-center">
+        <div className="flex items-center flex-col md:flex-row justify-between ">
           <h1 className="text-2xl mb-1 md:text-3xl md:block font-extrabold">Catálogo de Autos</h1>
 
           <div className="flex items-center space-x-4">
