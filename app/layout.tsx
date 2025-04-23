@@ -22,6 +22,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className="dark">
+      <head>
+        {/* Google Tag Manager */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-S56SK0LGBY"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-S56SK0LGBY');
+            `,
+          }}
+        />
+      </head>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
           <div className="flex flex-col min-h-screen bg-gradient-to-b from-black to-gray-900 text-white">
@@ -35,7 +49,3 @@ export default function RootLayout({
     </html>
   )
 }
-
-
-
-import './globals.css'
