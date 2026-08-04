@@ -172,7 +172,7 @@ export default function CarDetailPage({ params }: { params: Promise<{ id: string
               className="w-full bg-white hover:bg-gray-200 text-black py-6 rounded-lg my-6 transition-colors"
               onClick={() =>
                 handleContactClick(
-                  "+54 9 11 7368-2567",
+                  "+54 9 11 6143-8872",
                   `Hola, estoy interesado en el ${car.brand_name} ${car.model} (${car.year}) que aparece en su catálogo.`
                 )
               }

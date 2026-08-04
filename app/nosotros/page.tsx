@@ -198,34 +198,6 @@ export default function NosotrosPage() {
             </li>
           </ul>
         </div>
-
-
-
-        <div className="clean-card rounded-lg p-5 space-y-4">
-          <h2 className="text-xl font-light">Nuestro Equipo</h2>
-          <div className="grid grid-cols-2 gap-4 mt-4 md:grid-cols-4">
-            {[
-              { name: "Thiago Villarreal", role: "Sector Ventas" },
-              { name: "Luca Villarreal", role: "Sector Ventas" },
-              { name: "Tomás Nieto", role: "Sector Ventas" },
-              { name: "Pablo Donato", role: "Comunnity Manager" },
-            ].map((member, index) => (
-              <div key={index} className="text-center p-4 bg-black bg-opacity-40 rounded-lg">
-                <div className="w-16 h-16 mx-auto mb-3 rounded-full overflow-hidden bg-gray-800">
-                  <Image
-                    src={`/placeholder.svg?height=100&width=100&text=${member.name.charAt(0)}`}
-                    alt={member.name}
-                    width={64}
-                    height={64}
-                    className="object-cover"
-                  />
-                </div>
-                <h3 className="font-medium text-sm">{member.name}</h3>
-                <p className="text-gray-400 text-xs">{member.role}</p>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
       <WhatsAppFab phoneNumber="+123456789" message="Hola, me gustaría conocer más sobre GPM Automotriz" />

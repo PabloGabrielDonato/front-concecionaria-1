@@ -75,7 +75,7 @@ export default function ContactoPage() {
                 <Phone className="h-5 w-5 mr-3 text-gray-400 mt-0.5" />
                 <div>
                   <p className="font-medium text-sm">Teléfono</p>
-                  <p className="text-gray-400 text-sm">+54 9 11 7368-2567</p>
+                  <p className="text-gray-400 text-sm">+54 9 11 6143-8872</p>
                 </div>
               </div>
 
@@ -105,7 +105,7 @@ export default function ContactoPage() {
         </div>
       </div>
 
-      <WhatsAppFab phoneNumber="+54 9 11 7368-2567" message="Hola, estoy interesado en conocer más sobre sus vehículos" />
+      <WhatsAppFab phoneNumber="+54 9 11 6143-8872" message="Hola, estoy interesado en conocer más sobre sus vehículos" />
     </main>
   )
 }
