@@ -152,10 +152,6 @@ export default function CarDetailPage({ params }: { params: Promise<{ id: string
                   <p className="text-gray-400 text-sm">Modelo</p>
                   <p className="font-medium">{car.model}</p>
                 </div>
-                <div>
-                  <p className="text-gray-400 text-sm">Kilometraje</p>
-                  <p className="font-medium">{car.mileage_at_sale.toLocaleString()} km</p>
-                </div>
               </div>
 
               <div className="pt-2 bg-slate-900 bg-opacity-10 backdrop-blur-md rounded-lg p-4 flex flex-col items-center">

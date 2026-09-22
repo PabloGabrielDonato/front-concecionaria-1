@@ -118,8 +118,6 @@ export default function AutosPage() {
         return [...cars].sort((a, b) => a.brand_name.localeCompare(b.brand_name))
       case "added":
         return [...cars].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-      case "mileage":
-        return [...cars].sort((a, b) => a.mileage - b.mileage)
       default:
         return cars
     }
@@ -212,7 +210,6 @@ export default function AutosPage() {
               <option value="price">Ordenar por Precio</option>
               <option value="brand">Ordenar por Marca</option>
               <option value="added">Ordenar por Añadido</option>
-              <option value="mileage">Ordenar por Kilometraje</option>
             </select>
 
             
@@ -322,9 +319,7 @@ export default function AutosPage() {
                     <div className="p-4">
                       <h3 className="font-medium text-lg">
                         {car.brand_name} {car.model}
-                        <span className="font-light text-sm text-gray-500 ml-4">
-                          {car.mileage_at_sale.toLocaleString()} km
-                        </span>
+
                       </h3>
                       <p className="text-sm text-gray-400">
                         {car.version} • {car.year} • {car.bodywork}
